@@ -1,9 +1,10 @@
 # Add any form classes for Flask-WTF here
-# Add any form classes for Flask-WTF here
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField,PasswordField
 from wtforms.validators import InputRequired, Email
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired()])
@@ -12,7 +13,7 @@ class RegisterForm(FlaskForm):
     lastname = StringField('Last Name', validators=[InputRequired()])
     email = StringField('Email', validators=[InputRequired(), Email()])
     location = StringField('Location', validators=[InputRequired()])
-    biography = TextAreaField('Biography', validators=[InputRequired])
+    biography = TextAreaField('Biography', validators=[InputRequired()])
     photo = FileField('Poster', validators=[InputRequired(), FileRequired(), FileAllowed(['jpg','jpeg', 'png', 'gif', 'tiff', 'ai', 'raw', 'eps', 'webp', 'avif', 'svg'], 'Images only')])
     register = SubmitField('Register')
 
