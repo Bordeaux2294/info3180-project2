@@ -8,7 +8,7 @@ let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
 <template>
     <div class="container">
       <div class="text-center">
-        <img alt="Photogram photo" class="logo" src="@/assets/under_pier.jpg" width="125" height="125" />
+        <img alt="Photogram photo" class="logo" src="../images/under_pier.jpg" width="125" height="125" />
         <h1>{{ message }}</h1>
       </div>
     </div>

@@ -22,7 +22,7 @@ class Users(db.Model):
     profile_photo = db.Column(db.String(100))
     joined_on = db.Column(db.DateTime)
     
-    def __init__(self, id, username, password, firstname, lastname, email, location, biography, profile_photo, joined_on):
+    def __init__(self, id, username, password, firstname, lastname, email, location, biography, profile_photo):
         self.firstname = firstname
         self.lastname = lastname
         self.username = username
@@ -56,4 +56,29 @@ class Users(db.Model):
 class Posts(db.Model):
     __tablename__ = 'Posts'
 
-    
+    id = db.Column(db.Integer, primary_key=True)
+    caption = db.Column(db.String(125))
+    photo = db.Column(db.String(125))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship("User", backref="user")
+    created_on = db.Column(db.DateTime)
+
+    def __init__(self, id, caption, photo, user_id):
+        self.id= id
+        self.caption = caption
+        self.photo = photo
+        self.user_id = user_id
+        time = datetime.now(pytz.timezone('US/Eastern'))
+        self.created_on = time
+
+    def get_id(self):
+        try:
+            return unicode(self.id)  # python 2 support
+        except NameError:
+            return str(self.id)  # python 3 support
+
+    def __repr__(self):
+        return '<post: %r>' % (self.id)
+
+class Likes(db.Model):
+    __tablename__ = 'Likes'
