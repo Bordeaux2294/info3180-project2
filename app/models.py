@@ -22,13 +22,12 @@ class Users(db.Model):
     profile_photo = db.Column(db.String(100))
     joined_on = db.Column(db.DateTime)
     
-    def __init__(self, id, username, password, firstname, lastname, email, location, biography, profile_photo):
+    def __init__(self, username, password, firstname, lastname, email, location, biography, profile_photo):
         self.firstname = firstname
         self.lastname = lastname
         self.username = username
         self.password = generate_password_hash(password, method='pbkdf2:sha256')
         self.email = email
-        self.id= id
         self.location = location
         self.biography = biography
         self.profile_photo = profile_photo
@@ -59,12 +58,11 @@ class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(125))
     photo = db.Column(db.String(125))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
     user = db.relationship("User", backref="user")
     created_on = db.Column(db.DateTime)
 
-    def __init__(self, id, caption, photo, user_id):
-        self.id= id
+    def __init__(self, caption, photo, user_id):
         self.caption = caption
         self.photo = photo
         self.user_id = user_id
@@ -82,3 +80,44 @@ class Posts(db.Model):
 
 class Likes(db.Model):
     __tablename__ = 'Likes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('Posts.id'))
+    post = db.relationship("Post", backref="post")
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    user = db.relationship("User", backref="user")
+
+    def __init__(self,post_id, user_id):
+        self.post_id = post_id
+        self.user_id = user_id
+
+    def get_id(self):
+        try:
+            return unicode(self.id)  # python 2 support
+        except NameError:
+            return str(self.id)  # python 3 support
+
+    def __repr__(self):
+        return '<like: %r>' % (self.id)
+    
+class Follows(db.Model):
+    __tablename__ = 'Follows'
+
+    id = db.Column(db.Integer, primary_key=True)
+    follower_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    folLower = db.relationship("User", backref="user")
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    user = db.relationship("User", backref="user")
+
+    def __init__(self, follower_id, user_id):
+        self.follower_id = follower_id
+        self.user_id = user_id
+
+    def get_id(self):
+        try:
+            return unicode(self.id)  # python 2 support
+        except NameError:
+            return str(self.id)  # python 3 support
+
+    def __repr__(self):
+        return '<follows: %r>' % (self.id)
