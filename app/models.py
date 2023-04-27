@@ -4,12 +4,12 @@ import pytz
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 
-class Users(db.Model):
+class users(db.Model):
     # You can use this to change the table name. The default convention is to use
     # the class name. In this case a class name of UserProfile would create a
     # user_profile (singular) table, but if we specify __tablename__ we can change it
     # to `user_profiles` (plural) or some other name.
-    __tablename__ = 'Users'
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
@@ -52,14 +52,14 @@ class Users(db.Model):
     def __repr__(self):
         return '<User %r>' % (self.username)
     
-class Posts(db.Model):
-    __tablename__ = 'Posts'
+class posts(db.Model):
+    __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
     caption = db.Column(db.String(125))
     photo = db.Column(db.String(125))
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-    user = db.relationship("User", backref="user")
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship("users", backref="posts")
     created_on = db.Column(db.DateTime)
 
     def __init__(self, caption, photo, user_id):
@@ -78,14 +78,14 @@ class Posts(db.Model):
     def __repr__(self):
         return '<post: %r>' % (self.id)
 
-class Likes(db.Model):
-    __tablename__ = 'Likes'
+class likes(db.Model):
+    __tablename__ = 'likes'
     
     id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('Posts.id'))
-    post = db.relationship("Post", backref="post")
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-    user = db.relationship("User", backref="user")
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    post = db.relationship("posts", backref="likes")
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship("users", backref="likes")
 
     def __init__(self,post_id, user_id):
         self.post_id = post_id
@@ -100,14 +100,14 @@ class Likes(db.Model):
     def __repr__(self):
         return '<like: %r>' % (self.id)
     
-class Follows(db.Model):
-    __tablename__ = 'Follows'
+class follows(db.Model):
+    __tablename__ = 'follows'
 
     id = db.Column(db.Integer, primary_key=True)
-    follower_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-    folLower = db.relationship("User", backref="user")
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-    user = db.relationship("User", backref="user")
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    follower = db.relationship("users", backref="follows")
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship("users", backref="follows")
 
     def __init__(self, follower_id, user_id):
         self.follower_id = follower_id

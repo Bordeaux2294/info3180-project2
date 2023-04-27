@@ -1,7 +1,13 @@
 <script setup>
 import { ref } from "vue";
 
-let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
+function registerUser(){
+  window.location.href = '/register'
+}
+
+function loginUser(){
+  window.location.href = '/login'
+}
 
 </script>
 
@@ -15,12 +21,13 @@ let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
             <img alt="photogram logo" class="photogram_logo" src="../images/igicon.svg" width="20px" height="20px"/>
             <h1 class="login_title">Photogram</h1>
           </div>
+          <hr>
           <div class="body">
             <p>Share photos of your favourite moments with friends, family and the world
             </p>
             <div class="body_buttons">
-              <button id="register_button">Register</button>
-              <button id="login_button">Login</button>
+              <button id="register_button" v-on:click="registerUser">Register</button>
+              <button id="login_button" v-on:click="loginUser">Login</button>
             </div>
           </div>
         </div>
@@ -30,25 +37,36 @@ let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
 <style>
 /* Add any component specific styles here */
 .container {
-  border: 1px solid red;
   display: flex;
-  justify-content: space-evenly;
   align-items: center;
+  justify-content: center;
   height: 250px;
+  margin-top: 100px;
 }
 
 .photogram_photo_div {
-  border: 1px solid red;
+  border-radius: 10px;
   width: 25%;
   height: 90%;
   background-image: url(../images/under_pier.jpg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+  margin-right: 10px;
+  box-shadow: 7px 7px 4px rgba(0, 0, 0, 0.25);
+
+}
+
+hr {
+  width: 70%;
+  background-color: grey;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0px;
 }
 
 .login_div {
-  border: 1px solid grey;
+  border: 0.5px solid grey;
   border-radius: 10px;
   background-color: white;
   width: 45%;
@@ -57,16 +75,17 @@ let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
 }
 
 .title {
-  border: 1px solid green;
   display: flex;
   justify-content: center;
-  /* align-items: center; */
-  padding-top: 5px;
+  align-items: center;
+  padding: 25px 15px;
+  height: 20%;
 }
 
 .title h1 {
-  font-size: 16px;
+  font-size: 26px;
   font-family: fantasy;
+  margin-left: 5px;
 }
 
 .body {
@@ -74,19 +93,20 @@ let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 10px 10px;
 }
 
 .body_buttons {
-  border: 1px solid red;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   padding: 5px 5px;
   width: 50%;
+  margin-top: 15px;
 }
 
 .body_buttons button {
-  width: 70px;
+  width: 100px;
   height: 30px;
   color: white;
   font-weight: bold;
@@ -105,6 +125,23 @@ let message = ref("Hello World! This is a VueJS and Flask Starter Template.")
   border: 1px solid rgb(63, 63, 184);
 }
 
+#register_button:hover {
+  background-color: rgb(80, 255, 80);
+  border: 1px solid rgb(80, 255, 80);
+}
 
+#register_button:active {
+  background-color: rgb(18, 156, 18);
+  border: 1px solid rgb(18, 156, 18);
+}
 
+#login_button:hover {
+  background-color: rgb(83, 83, 248);
+  border: 1px solid rgb(83, 83, 248);
+}
+
+#login_button:active {
+  background-color: rgb(49, 49, 156);
+  border: 1px solid rgb(49, 49, 156);
+}
 </style>
