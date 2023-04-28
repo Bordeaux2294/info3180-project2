@@ -1,5 +1,5 @@
 <template>
-    <div class="form_div">
+    <div class="form_div1">
         <form @submit.prevent="register" id="register_form">
             <div class="input_div">
                 <label for="username">Username</label>
@@ -42,21 +42,21 @@
 
 <script setup>
 
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 
 let csrf_token = ref("");
 
 async function getCsrfToken() {
-    await fetch('/api/v1/csrf-token')
+        await fetch('/api/v1/csrf-token')
         .then(async (response) => await response.json())
         .then(async (data) => {
-            csrf_token.value = data.csrf_token;
+        csrf_token.value = data.csrf_token;
         })
         .catch(async error => console.log(await error))
-}
+    }
 
 
-async function register() {
+async function register(){
 
     let register_form = document.getElementById('register_form');
     let form_data = new FormData(register_form);
@@ -64,19 +64,26 @@ async function register() {
     fetch('/api/v1/register', {
         method: 'POST',
         body: form_data,
-        headers: {
-            'X-CSRFToken': csrf_token.value
+        headers:{
+            'X-CSRFToken':csrf_token.value
         }
     })
-        .then(async function (response) {
-        })
-        .catch(async function (error) {
-            console.log(await error)
-        })
+    .then(async function (response){
+        if(response.ok){
+            let result = await response.json()
+            console.log(result)
+            
+        }else{
+            alert("User could not be registered!")
+        }
+    })
+    .catch (async function (error){
+        console.log(await error)
+    })
 
 }
 
-onMounted(() => {
+onMounted(()=> {
     getCsrfToken()
 })
 
@@ -85,7 +92,8 @@ onMounted(() => {
 </script>
 
 <style>
-.form_div {
+
+.form_div1 {
     border: 0.5px solid grey;
     border-radius: 10px;
     display: flex;
@@ -140,4 +148,6 @@ onMounted(() => {
     background-color: rgb(27, 155, 27);
     border: 1px solid rgb(27, 155, 27);
 }
+
+
 </style>

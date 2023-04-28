@@ -4,7 +4,7 @@
         <form @submit.prevent="login" id="loginForm">
             <div class="form-group mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" />
+                <input type="text" name="username" v-model="username" class="form-control" />
             </div>
             <div class="form-group mb-3">
                 <label for="password" class="form-label">Password</label>
@@ -25,9 +25,9 @@ import { ref, onMounted } from 'vue';
 import router from '../router/index'
 
 let csrf_token = ref("")
+
 // const username = ref('');
 // const password = ref('');
-
 
 async function getCsrfToken() {
         await fetch('/api/v1/csrf-token')
@@ -41,20 +41,23 @@ async function getCsrfToken() {
 async function login(){
     const form = document.getElementById('loginForm')
     const formObject = new FormData(form)
-    fetch('/api/v1/auth/login',{
-      method: 'POST',
-      body: formObject,
-      headers:{
-          'X-CSRFToken':csrf_token.value
-      }
-    })
-    .then(async function (response){
-      if(response.ok){
-        let result = await response.json()
-        localStorage.setItem('user-token', result.token)
-        window.location.reload()
-      }
-    })
+  fetch('/api/v1/auth/login',{
+    method: 'POST',
+    body: formObject,
+    headers:{
+        'X-CSRFToken':csrf_token.value
+    }
+  })
+  .then(async function (response){
+    if(response.ok){
+      let result = await response.json()
+      console.log(result)
+      localStorage.setItem('user-token', result.token)
+      window.location.href = '/explore'
+    }else{
+        alert("Could not login user!")
+    }
+  })
 }
 
 onMounted(() => {
@@ -68,7 +71,7 @@ onMounted(() => {
 
 .form_div {
     border: 0.5px solid grey;
-    border-radius: 0px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     flex-direction: column;

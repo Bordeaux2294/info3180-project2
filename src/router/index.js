@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import LoginView from '../views/LoginView.vue'
+import AddUser from '../views/AddUserView.vue'
+import LoginUser from '../views/LoginView.vue'
+import ExplorePosts from '../views/ExplorePostsView.vue'
+import UserProfileView from '../views/UserProfileView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,32 +25,45 @@ const router = createRouter({
     {
       path: '/register',
       name: 'register',
-      component: RegisterView
+      component: AddUser
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginUser
+    },
+    {
+      path: '/explore',
+      name: 'explore',
+      component: ExplorePosts
+    },
+    {
+      path: '/users/:id',
+      name: 'UserProfile',
+      component: UserProfileView
     }
+
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('user-token')
+// router.beforeEach((to, from, next) => {
+//   const token = localStorage.getItem('user-token')
   
-  if (token) {
-    if (to.name == 'login' || to.name == 'register'){
-      next({ name: 'home' })
-    }else{
-      next()
-    }
-  } else {
-    if (to.name == 'login' || to.name == 'register') {
-      next()
-    }else {
-      next({ name: 'login' })
-    }
-  }
-})
+//   if (token) {
+//     if (to.name == 'login' || to.name == 'register'){
+//       next({ name: 'home' })
+//     }else{
+//       next()
+//     }
+//   } else {
+//     if (to.name == 'login' || to.name == 'register') {
+//       next()
+//     }else {
+//       next({ name: 'login' })
+//     }
+//   }
+// })
+
+
 
 export default router

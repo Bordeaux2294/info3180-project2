@@ -1,18 +1,18 @@
 <template>
     <div class="login_container">
-        <LoginForm />
+        <Login />
     </div>
 </template>
 
 
 <script setup>
-    import LoginForm from '@/components/LoginForm.vue'
+    import Login from '@/components/Login.vue'
 </script>
 
 <style>
 
 .login_container {
-    border: 1px solid red;
+    margin-bottom: 35%;
 }
 
 </style>
