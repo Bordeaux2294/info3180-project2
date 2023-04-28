@@ -101,6 +101,7 @@ hr {
   padding: 10px 10px;
   font-style: italic;
   color: grey;
+  padding: 10px 10px;
 }
 
 .body_buttons {
@@ -132,15 +133,6 @@ hr {
   border: 1px solid rgb(63, 63, 184);
 }
 
-#register_button:hover {
-  background-color: rgb(80, 255, 80);
-  border: 1px solid rgb(80, 255, 80);
-}
-
-#register_button:active {
-  background-color: rgb(18, 156, 18);
-  border: 1px solid rgb(18, 156, 18);
-}
 
 #login_button:hover {
   background-color: rgb(83, 83, 248);
