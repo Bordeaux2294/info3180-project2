@@ -5,18 +5,56 @@ Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file creates your application.
 """
 
-# from . import db
-import jwt
-from functools import wraps
 from . import app, db
-import os
-from flask import render_template, request, jsonify, send_file, make_response, send_from_directory
-from flask_login import login_user, logout_user, current_user, login_required
-from app.models import users, posts,likes, follows
-from app.forms import RegisterForm, LoginForm, NewPostForm
-from flask_wtf.csrf import generate_csrf
+from flask import render_template, request, jsonify, send_file, url_for, flash, session, abort, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
+from flask_wtf.csrf import generate_csrf
+from functools import wraps
+from datetime import datetime, timedelta
+from app.models import Posts, Likes, Follows, Users
+from app.forms import RegisterForm, LoginForm, NewPostForm
+
+import jwt
+import os
+
+
+# Create a JWT @requires_auth decorator
+# This decorator can be used to denote that a specific route should check
+# for a valid JWT token before displaying the contents of that route.
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.headers.get('Authorization', None) # or request.cookies.get('token', None)
+
+        if not auth:
+            return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
+
+        parts = auth.split()
+
+        if parts[0].lower() != 'bearer':
+            return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
+        elif len(parts) == 1:
+            return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
+        elif len(parts) > 2:
+            return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
+        
+
+        token = parts[1]
+    
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
+        except jwt.DecodeError:
+            return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
+
+        current_user = Users.query.filter_by(id = data['user_id']).first()
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
 
 
 ###
@@ -27,13 +65,14 @@ from werkzeug.security import check_password_hash
 def index():
     return jsonify(message="This is the beginning of our API")
 
+
 @app.route('/api/v1/register', methods = ['POST'])
 def register():
-    form = RegisterForm()
-    response = ''
-
     if request.method=='POST':
+        form = RegisterForm()
         if form.validate_on_submit():
+            response = {}
+
             username = form.username.data
             password = form.password.data
             firstname = form.firstname.data
@@ -41,8 +80,13 @@ def register():
             email = form.email.data
             location = form.location.data
             biography = form.biography.data
-            profile_photo = form.photo.data
-            photo_filename = secure_filename(profile_photo.filename)
+            profile_photo_data = form.photo.data
+            profile_photo = secure_filename(profile_photo_data.filename)
+
+            new_user= Users(username, password, firstname, lastname, email, location, biography, profile_photo)
+            profile_photo_data.save(os.path.join(app.config['UPLOAD_FOLDER'], profile_photo))
+            db.session.add(new_user)
+            db.session.commit()
 
             response = jsonify({"message": "User Successfully Added",
                                 "username": username,
@@ -52,68 +96,54 @@ def register():
                                 "email" : email,
                                 "location": location,
                                 "biography":biography,
-                                "photo": photo_filename})
-            new_user= users(username, password, firstname, lastname, email, location, biography, photo_filename)
-            profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
-            db.session.add(new_user)
-            db.session.commit()
+                                "photo": profile_photo})
+                                
         
-            return response
+            return make_response(response,200)
         else:
-            return make_response({'errors': form_errors(form)},400)
-
-
+            return make_response(jsonify({'errors': form_errors(form)}),400)
 
 @app.route('/api/v1/auth/login', methods = ['POST'])
 def login():
-    form = LoginForm()
-    response = ''
-
     if request.method=='POST':
+        form = LoginForm()
         if form.validate_on_submit():
             username = form.username.data
             password = form.password.data
 
-            user = db.session.execute(db.select(users).filter_by(username=username)).scalar()
+            user = db.session.execute(db.select(Users).filter_by(username=username)).scalar()
        
             if user is not None and (check_password_hash(user.password, password)):
-                login_user(user)
-                response = make_response({"message": "Login Successful"},200)
+                timestamp = datetime.utcnow()
+                payload = {
+                    "sub": 1,
+                    "iat": timestamp,
+                    "exp": timestamp + timedelta(minutes=60),
+                    "user_id": user.id
+                }
+
+                token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
             
-            return response
+                return make_response(jsonify({'token' : token, "message": "Login Successful"}),201)
         else:
             return make_response({'errors': form_errors(form)},400)
 
 
-
-@app.route('/api/v1/auth/logout', methods = ['POST'])
-
-def logout():
-    logout_user()
-    response = jsonify({"Message":"Logout Successfull"})
-    return response
-
-# user_loader callback. This callback is used to reload the user object from
-# the user ID stored in the session
-# @login_manager.user_loader
-# def load_user(id):
-#     return db.session.execute(db.select(Users).filter_by(id=id)).scalar()
-
-
 @app.route('/api/v1/users/<user_id>/posts', methods = ['POST','GET'])
-def posts(user_id):
+@requires_auth
+def posts(current_user, user_id):
     if request.method=='POST':
         form = NewPostForm()
         if form.validate_on_submit():
             caption = form.caption.data
             photo = form.photo.data
             pname = secure_filename(photo.filename)
-            newPost = posts(caption, pname, user_id)
+            newPost = Posts(caption, pname, current_user)
             db.session.add(newPost)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], pname))
             db.session.commit()
 
-            return jsonify({"message": "Successfully created a new post"})
+            return make_response({"message": "Successfully created a new post"},200)
         else:
             return make_response({'errors': form_errors(form)},400)
     
@@ -124,53 +154,69 @@ def posts(user_id):
             pList.append({
             "id": post.id,
             "user_id": post.user_id,
-            "photo": "/api/v1/photos/{}".format(post.photo),
+            "photo": "/api/v1/profile_photo/{}".format(post.photo),
             "caption": post.caption,
             "created_on": post.created_on
         })
     
-        data = {"posts": pList}
-        return jsonify(data)
-
-
-
-#     return 1
+        response =   jsonify({"posts": pList})
+        return make_response(jsonify(response),200)
 
 @app.route('/api/v1/users/<user_id>/follow', methods = ['POST'])
+@requires_auth
+def follow(current_user, user_id):
+    if request.method=='POST':
+        follower_id = current_user
+        user_id = user_id
+        newFollower = Follows(follower_id, user_id)
+        db.session.add(newFollower)
+        db.session.commit()
+
+        return make_response({"message": "Successfully followed user"},200)
+
+
 
 @app.route('/api/v1/posts', methods = ['GET'])
-def showposts():
-    posts = posts.query.all()
-    plist = []
+@requires_auth
+def allPosts(current_user):
+    posts = Posts.query.all()
+    pList = []
 
     for post in posts:
-        likes = likes.query.filter_by(post_id=post.id).all()
-        plist.append({
+        likes = len(likes.query.filter_by(post_id=post.id).all())
+        pList.append({
             "id": post.id,
             "user_id": post.user_id,
-            "photo": "/api/v1/photos/{}".format(post.photo),
+            "photo": "/api/v1/profile_photo/{}".format(post.photo),
             "caption": post.caption,
             "created_on": post.created_on,
             "likes": likes
         })
     
-    data = {"posts": plist}
+    data = {"posts": pList}
     return jsonify(data)
 
 @app.route('/api/v1/posts/<post_id>/like', methods = ['POST'])
+def like(post_id):
+    if request.method=='POST':
+        user_id = current_user
+        post_id = post_id
+        newLike= Likes(post_id, user_id)
+        db.session.add(newLike)
+        db.session.commit()
+
+        return make_response({"message": "Successfully liked post"},200)
 
 
-
-@app.route('/api/v1/photos/<filename>')
-def getPoster(filename):
+@app.route('/api/v1/profile_photo/<filename>')
+@requires_auth
+def getProfilePhoto(current_user, filename):
     root_dir = os.getcwd()
     return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER']), filename)
 
-
-@app.route('/api/v1/csrf-token', methods=['GET']) 
-def get_csrf():     
-    return jsonify({'csrf_token': generate_csrf()})  
-
+@app.route('/api/v1/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token': generate_csrf()})
 
 ###
 # The functions below should be applicable to all Flask apps.
@@ -214,9 +260,3 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
-
-# profile_photo="er"
-# new_user= Users("gravl","password","firstname","lastname","t@gmail.com","location","biography","photo_filename")
-# profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], profile_photo))
-# db.session.add(new_user)
-# db.session.commit()

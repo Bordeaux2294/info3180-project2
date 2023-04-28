@@ -1,12 +1,12 @@
 <template>
     <div class="login_container">
-        <Login />
+        <LoginForm />
     </div>
 </template>
 
 
 <script setup>
-    import Login from '@/components/Login.vue'
+    import LoginForm from '@/components/LoginForm.vue'
 </script>
 
 <style>

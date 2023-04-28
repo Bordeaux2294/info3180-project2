@@ -1,5 +1,3 @@
-# Add any form classes for Flask-WTF here
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField,PasswordField
 from wtforms.validators import InputRequired, Email
