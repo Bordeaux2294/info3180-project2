@@ -6,7 +6,8 @@ This file creates your application.
 """
 
 # from . import db
-
+import jwt
+from functools import wraps
 from . import app, db
 import os
 from flask import render_template, request, jsonify, send_file, make_response, send_from_directory
@@ -16,8 +17,6 @@ from app.forms import RegisterForm, LoginForm, NewPostForm
 from flask_wtf.csrf import generate_csrf
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
-
-
 
 
 ###
@@ -79,8 +78,7 @@ def login():
        
             if user is not None and (check_password_hash(user.password, password)):
                 login_user(user)
-
-                response = jsonify({"message": "Login Successful"})
+                response = make_response({"message": "Login Successful"},200)
             
             return response
         else:
@@ -89,6 +87,7 @@ def login():
 
 
 @app.route('/api/v1/auth/logout', methods = ['POST'])
+
 def logout():
     logout_user()
     response = jsonify({"Message":"Logout Successfull"})
@@ -138,8 +137,28 @@ def posts(user_id):
 #     return 1
 
 @app.route('/api/v1/users/<user_id>/follow', methods = ['POST'])
+
 @app.route('/api/v1/posts', methods = ['GET'])
+def showposts():
+    posts = posts.query.all()
+    plist = []
+
+    for post in posts:
+        likes = likes.query.filter_by(post_id=post.id).all()
+        plist.append({
+            "id": post.id,
+            "user_id": post.user_id,
+            "photo": "/api/v1/photos/{}".format(post.photo),
+            "caption": post.caption,
+            "created_on": post.created_on,
+            "likes": likes
+        })
+    
+    data = {"posts": plist}
+    return jsonify(data)
+
 @app.route('/api/v1/posts/<post_id>/like', methods = ['POST'])
+
 
 
 @app.route('/api/v1/photos/<filename>')

@@ -21,6 +21,7 @@ class users(db.Model):
     biography = db.Column(db.String(255))
     profile_photo = db.Column(db.String(100))
     joined_on = db.Column(db.DateTime)
+    follows = db.relationship('users', secondary='follows', primaryjoin=('follows.user_id == users.id'), secondaryjoin=('follows.follower_id == users.id'), backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
     
     def __init__(self, username, password, firstname, lastname, email, location, biography, profile_photo):
         self.firstname = firstname
@@ -105,9 +106,7 @@ class follows(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    follower = db.relationship("users", backref="follows")
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship("users", backref="follows")
 
     def __init__(self, follower_id, user_id):
         self.follower_id = follower_id

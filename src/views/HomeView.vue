@@ -82,6 +82,11 @@ hr {
   height: 20%;
 }
 
+.photogram_logo {
+  width: 20px;
+  height: 20px;
+}
+
 .title h1 {
   font-size: 26px;
   font-family: fantasy;
@@ -94,6 +99,8 @@ hr {
   justify-content: center;
   align-items: center;
   padding: 10px 10px;
+  font-style: italic;
+  color: grey;
 }
 
 .body_buttons {
