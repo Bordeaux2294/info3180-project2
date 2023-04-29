@@ -37,14 +37,7 @@
 
 <script setup>
   import { ref } from 'vue';
+   
   
-  const isFollowing = ref(false);
   
-  async function followUser() {
-    isFollowing.value = true;
-  }
-  
-  async function unfollowUser() {
-    isFollowing.value = false;
-  }
 </script>

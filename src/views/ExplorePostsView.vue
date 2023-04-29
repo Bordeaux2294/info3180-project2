@@ -12,7 +12,6 @@
 <style>
 
 .explore_posts_container {
-    border: 1px solid red;
     display: flex;
     height: 900px;
     justify-content: center;

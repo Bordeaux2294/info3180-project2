@@ -28,29 +28,29 @@
 
 <style>
 .explore_container {
-    border: 1px solid green;
     display: flex;
+    margin-right: 10px;
 }
 
 .posts_container {
     width: 80%;
-    height: 100%;
+    height: fit-content;
     display: flex;
     flex-direction: column;
-    padding: 5px 5px;
+    border: 0.5px solid grey;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .new_posts_button_container {
-    border: 1px solid orange;
     width: 20%;
     text-align: center;
 }
 
 .post_title {
-    border: 1px solid grey;
-    border-radius: 10px;
     display: flex;
-    margin-bottom: 5px;
+    padding-top: 10px;
 }
 
 .post_title img {
@@ -64,16 +64,20 @@
     background-image: url(../images/fitf.png);
     background-repeat: no-repeat;
     background-size: cover;
-    border-radius: 10px;
+}
+
+.post_body {
+    padding: 10px 5px;
 }
 
 .post_footer {
-    border: 1px solid red;
+    /* border: 1px solid red; */
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 25px;
     padding: 5px 5px;
+    font-weight: bold;
 }
 
 .post_footer img{
@@ -81,9 +85,13 @@
 }
 
 
-/* .new_posts_button_container button{
-
-} */
+.new_posts_button_container button{
+    background-color: rgb(59, 59, 250);
+    border: 1px solid rgb(59, 59, 250);
+    color: white;
+    border-radius: 5px;
+    margin-top: 5px;
+}
 
 
 </style>

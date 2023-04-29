@@ -103,11 +103,11 @@ def register():
 
 
 
+
 @app.route('/api/v1/auth/login', methods = ['POST'])
 def login():
     if request.method=='POST':
         form = LoginForm()
-        response = {}
         if form.validate_on_submit():
             username = form.username.data
             password = form.password.data
@@ -115,12 +115,20 @@ def login():
             user = db.session.execute(db.select(users).filter_by(username=username)).scalar()
        
             if user is not None and (check_password_hash(user.password, password)):
-                login_user(user)
-                response = make_response({"message": "Login Successful"},200)
+                timestamp = datetime.utcnow()
+                payload = {
+                    "sub": 1,
+                    "iat": timestamp,
+                    "exp": timestamp + timedelta(minutes=60),
+                    "user_id": user.id
+                }
+
+                token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
             
-            return response
+                return make_response(jsonify({'token' : token, "message": "Login Successful"}),201)
         else:
             return make_response({'errors': form_errors(form)},400)
+       
 
 
 
