@@ -1,6 +1,6 @@
 <template>
     <div class="explore_posts_container">
-        <Explore />
+        <Explore/>
     </div>
 </template>
 

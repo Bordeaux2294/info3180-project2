@@ -4,6 +4,7 @@ import AddUser from '../views/AddUserView.vue'
 import LoginUser from '../views/LoginView.vue'
 import ExplorePosts from '../views/ExplorePostsView.vue'
 import UserProfileView from '../views/UserProfileView.vue'
+import NewPostsView from '../views/NewPostsView.vue'
 
 
 const router = createRouter({
@@ -41,7 +42,12 @@ const router = createRouter({
       path: '/users/:id',
       name: 'UserProfile',
       component: UserProfileView
-    }
+    },
+    {
+      path: '/posts/new',
+      name: 'new_posts',
+      component: NewPostsView
+    },
 
   ]
 })

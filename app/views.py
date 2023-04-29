@@ -217,7 +217,7 @@ def follow(current_user, user_id):
 
 @app.route('/api/v1/posts', methods=['GET'])
 @login_required
-@requires_auth
+#@requires_auth
 def get_all_posts():
     """Return all posts for all users"""
     postsl = db.session.execute(db.select(posts)).scalars()

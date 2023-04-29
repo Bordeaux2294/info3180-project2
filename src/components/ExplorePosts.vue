@@ -1,30 +1,75 @@
 <template>
-    <div class="explore_container">
+
+    <div class="explore_container" v-for="(postData, index) in data" :key="index">
         <div class="posts_container">
             <div>
                 <div class="post_title">
                     <img alt="avatar-icon" src="../images/black_guy.webp" width="30px" height="30px"/>
-                    <p>User Name</p>
+                    <p>{{postData.user_id}}</p>
                 </div>
                 <div class="post_image">
 
                 </div>
                 <div class="post_body">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus repudiandae dolore totam, ipsum impedit consequuntur facere quae odio ut aut?
+                    {{postData.caption}}
                 </div>
                 <div class="post_footer">
-                    <p><img alt="heart-icon" src="../images/unliked.svg" width="20px" height="20px">10 Likes</p>
-                    <p>24 Apr 2018</p>
+                    <p><img alt="heart-icon" src="../images/unliked.svg" width="20px" height="20px">{{postData.likes}} Likes</p>
+                    <p>{{postData.created_on}}</p>
                 </div>
             </div>
         </div>
         <div class="new_posts_button_container">
-            <button>New Posts</button>
+            <button v-on:click="makeNewPost">New Posts</button>
         </div>
     </div>
 </template>
 
 
+<script setup>
+    import {ref, onMounted} from 'vue'
+    let data = ref([])
+    let csrf_token = ref("")
+
+    function makeNewPost(){
+        window.location.href = '/posts/new'
+    }
+
+    async function getCsrfToken() {
+        await fetch('/api/v1/csrf-token')
+        .then(async (response) => await response.json())
+        .then(async (data) => {
+        csrf_token.value = data.csrf_token;
+        })
+        .catch(async error => console.log(await error))
+    }
+
+    async function getPosts(){
+        await fetch('/api/v1/posts', {
+            method: 'GET',
+            headers:{
+                'X-CSRFToken':csrf_token.value
+            }
+
+        })
+            .then(async response => {
+                if(response.status){
+                    let result = await response.json()
+                    console.log(result)
+                }
+
+            })
+            .catch(async error => {
+                console.log(await error)
+            })
+    }
+
+    onMounted(()=>{
+        getCsrfToken()
+        getPosts()
+    })
+
+</script>
 
 <style>
 .explore_container {

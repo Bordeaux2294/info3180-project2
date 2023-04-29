@@ -1,0 +1,354 @@
+{
+	"info": {
+		"_postman_id": "bb56596c-7cce-4168-a561-b8a7297cc160",
+		"name": "info3180-project2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26808350"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZExwgg.7jSBZ5Iqy9KjpVJBmr5n-5xT0fY",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "Granite",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Rock",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}v1/auth/login",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get csrf token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}v1/csrf-token",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"csrf-token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY4MjczMjI3MSwiZXhwIjoxNjgyNzM1ODcxLCJ1c2VyX2lkIjo2fQ.ZKQsgfTqYNwLIGmhxPli4uUP3znCTwEJEo7BkrFf8H4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZExxKQ.BZrdcV04uR9UHeJ6zzBKbwoTgaY",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "Klein",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Morietty",
+							"type": "text"
+						},
+						{
+							"key": "firstname",
+							"value": "Klein",
+							"type": "text"
+						},
+						{
+							"key": "lastname",
+							"value": "Morietty",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "klein.Morietty@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "location",
+							"value": "Chernobyl",
+							"type": "text"
+						},
+						{
+							"key": "biography",
+							"value": "Half man half amazing",
+							"type": "text"
+						},
+						{
+							"key": "photo",
+							"type": "file",
+							"src": "/C:/Users/user/OneDrive/Desktop/info3180-project2/info3180-project2/uploads/1ceb4d89423171.5df3d1fa13b5c.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}v1/register",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get posts for user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY4MjczMjI3MSwiZXhwIjoxNjgyNzM1ODcxLCJ1c2VyX2lkIjo2fQ.ZKQsgfTqYNwLIGmhxPli4uUP3znCTwEJEo7BkrFf8H4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZExxKQ.BZrdcV04uR9UHeJ6zzBKbwoTgaY",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY4MjczMjA1NiwiZXhwIjoxNjgyNzM1NjU2LCJ1c2VyX2lkIjo2fQ.vYFt7P0s5ib9_0wuw1qZBNeToCGK7szU4fBvJY0JKrQ",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{url}}v1/users/:user_id/posts",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"users",
+						":user_id",
+						"posts"
+					],
+					"variable": [
+						{
+							"key": "user_id",
+							"value": "6"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get posts",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "create post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY4MjczMzYxNSwiZXhwIjoxNjgyNzM3MjE1LCJ1c2VyX2lkIjo3fQ.WZHhJ235Krawb_NK6uQiBZ_ukSUkGa5foUECjANy4ns",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZEx6Iw.Um8DAe44Ds9w8rrUCTlFSYBdlnA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "caption",
+							"value": "Peak fiction actualized",
+							"type": "text"
+						},
+						{
+							"key": "photo",
+							"type": "file",
+							"src": "/C:/Users/user/OneDrive/Desktop/info3180-project2/info3180-project2/src/images/post1.jpeg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}v1/users/:user_id/posts",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"users",
+						":user_id",
+						"posts"
+					],
+					"variable": [
+						{
+							"key": "user_id",
+							"value": "7"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "follow user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZEx6Iw.Um8DAe44Ds9w8rrUCTlFSYBdlnA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}v1/users/:user_id/follow",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"users",
+						":user_id",
+						"follow"
+					],
+					"variable": [
+						{
+							"key": "user_id",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "like post",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZEx6Iw.Um8DAe44Ds9w8rrUCTlFSYBdlnA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}v1/posts/:post_id/like",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"posts",
+						":post_id",
+						"like"
+					],
+					"variable": [
+						{
+							"key": "post_id",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRFToken",
+						"value": "IjMyYTlhZjFhOTcyOTM5YWRlY2UwNWNhM2M5MTBlMzUxNGY4ODFhNDUi.ZEx6Iw.Um8DAe44Ds9w8rrUCTlFSYBdlnA",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}v1/auth/logout",
+					"host": [
+						"{{url}}v1"
+					],
+					"path": [
+						"auth",
+						"logout"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
