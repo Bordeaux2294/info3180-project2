@@ -20,7 +20,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired()])
     login = SubmitField('Login')
 
-class NewPostForm(FlaskForm):
+class PostForm(FlaskForm):
     photo = StringField('Photo', validators=[InputRequired()])
     caption = TextAreaField('Caption', validators=[InputRequired()])
     submit = SubmitField('Submit')   

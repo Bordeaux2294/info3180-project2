@@ -13,7 +13,7 @@ from flask_wtf.csrf import generate_csrf
 from functools import wraps
 from datetime import datetime, timedelta
 from app.models import Posts, Likes, Follows, Users
-from app.forms import RegisterForm, LoginForm, NewPostForm
+from app.forms import RegisterForm, LoginForm, PostForm
 
 import jwt
 import os
@@ -26,6 +26,7 @@ def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         auth = request.headers.get('Authorization', None) # or request.cookies.get('token', None)
+        
 
         if not auth:
             return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
@@ -51,7 +52,7 @@ def requires_auth(f):
             return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
 
         current_user = Users.query.filter_by(id = data['user_id']).first()
-
+        
         return f(current_user, *args, **kwargs)
 
     return decorated
@@ -124,7 +125,7 @@ def login():
 
                 token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
             
-                return make_response(jsonify({'token' : token, "message": "Login Successful"}),201)
+                return make_response(jsonify({'token' : token, "username": user.username, "message": "Login Successful"}),201)
         else:
             return make_response({'errors': form_errors(form)},400)
 
@@ -133,12 +134,12 @@ def login():
 @requires_auth
 def posts(current_user, user_id):
     if request.method=='POST':
-        form = NewPostForm()
+        form = PostForm()
         if form.validate_on_submit():
             caption = form.caption.data
             photo = form.photo.data
             pname = secure_filename(photo.filename)
-            newPost = Posts(caption, pname, current_user)
+            newPost = Posts(caption, pname, current_user.id)
             db.session.add(newPost)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], pname))
             db.session.commit()
@@ -154,7 +155,7 @@ def posts(current_user, user_id):
             pList.append({
             "id": post.id,
             "user_id": post.user_id,
-            "photo": "/api/v1/profile_photo/{}".format(post.photo),
+            "photo": "/api/v1/images/{}".format(post.photo),
             "caption": post.caption,
             "created_on": post.created_on
         })
@@ -183,11 +184,14 @@ def allPosts(current_user):
     pList = []
 
     for post in posts:
-        likes = len(likes.query.filter_by(post_id=post.id).all())
+        likes = len(Likes.query.filter_by(post_id=post.id).all())
+        user = Users.query.filter_by(id = post.user_id).first()
         pList.append({
             "id": post.id,
             "user_id": post.user_id,
-            "photo": "/api/v1/profile_photo/{}".format(post.photo),
+            "username": user.username,
+            "user_profile": "/api/v1/images/{}".format(user.profile_photo),  
+            "photo": "/api/v1/images/{}".format(post.photo),
             "caption": post.caption,
             "created_on": post.created_on,
             "likes": likes
@@ -197,9 +201,10 @@ def allPosts(current_user):
     return jsonify(data)
 
 @app.route('/api/v1/posts/<post_id>/like', methods = ['POST'])
-def like(post_id):
+@requires_auth
+def like(current_user,post_id):
     if request.method=='POST':
-        user_id = current_user
+        user_id = current_user.id
         post_id = post_id
         newLike= Likes(post_id, user_id)
         db.session.add(newLike)
@@ -208,9 +213,8 @@ def like(post_id):
         return make_response({"message": "Successfully liked post"},200)
 
 
-@app.route('/api/v1/profile_photo/<filename>')
-@requires_auth
-def getProfilePhoto(current_user, filename):
+@app.route('/api/v1/images/<filename>')
+def getProfilePhoto(filename):
     root_dir = os.getcwd()
     return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER']), filename)
 

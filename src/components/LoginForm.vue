@@ -52,6 +52,7 @@ async function login(){
       if(response.ok){
         let result = await response.json()
         localStorage.setItem('user-token', result.token)
+        localStorage.setItem('user-name', result.username)
         window.location.reload()
       }
     })
