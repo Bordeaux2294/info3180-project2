@@ -58,3 +58,38 @@
     })
 
 </script>
+
+
+<style>
+.new_post_container {
+    border: 1px solid grey;
+    border-radius: 10px;
+    background-color: burlywood;
+    display: flex;
+    height: 80%;
+}
+
+.new_post_container form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 5px 5px;
+}
+
+.new_post_container label {
+    margin-top: 20px;
+}
+
+.new_post_container button {
+    width: 45%;
+    height: 30px;
+    color: white;
+    background-color: rgb(34, 212, 34);
+    border: 1px solid rgb(34, 212, 34);
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 25px;
+}
+
+</style>
