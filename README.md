@@ -1,8 +1,8 @@
 # Members that Contributed
-Al-Romario Davis - 95% of the front end
-Trishanna Ford - 95% of the back end
-Orane - 5% of the backend, JWT generation function and the css for the explore page
-Gabrielle - log-in form css
+Al-Romario Davis - 95% of the front end,
+Trishanna Ford - 95% of the back end,
+Orane Henriques- 5% of the backend, JWT generation function and the css for the explore page,
+Gabriell Gardner - log-in form css
 
 
 # INFO3180 VueJS and Flask Starter
