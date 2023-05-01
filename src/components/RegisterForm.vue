@@ -72,7 +72,7 @@ async function register(){
         if(response.ok){
             let result = await response.json()
             sessionStorage.setItem('current_user', JSON.stringify(result))
-            alert(result.id)
+            alert("Registration successful!")
             
         }else{
             alert("User could not be registered!")

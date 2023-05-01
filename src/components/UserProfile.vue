@@ -43,7 +43,7 @@
   </div>
 
       <div class="photo-grid">
-        <img v-for="photo in photos.posts" :key="photo.id" :src="photo.photo" alt="photo" class="photo-post" height="80px" width="80px">
+        <img v-for="photo in photos.posts" :key="photo.id" :src="photo.photo" alt="photo" class="photo-post" height="50px" width="50px">
       </div>
       
 
