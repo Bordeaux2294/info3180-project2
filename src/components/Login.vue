@@ -52,7 +52,8 @@ async function login(){
     if(response.ok){
       let result = await response.json()
       console.log(result)
-      localStorage.setItem('user-token', result.token)
+      sessionStorage.setItem('current_user', JSON.stringify(result))
+      // localStorage.setItem('user-token', result.token)
       window.location.href = '/explore'
     }else{
         alert("Could not login user!")

@@ -26,7 +26,7 @@
               <RouterLink class="nav-link" to="/explore">Explore</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/">My Profile</RouterLink>
+              <RouterLink class="nav-link" :to="getMyProfile()">My Profile</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink class="nav-link" to="/">Logout</RouterLink>
@@ -50,10 +50,21 @@ onMounted(() => {
   setToken()
 })
 function logout() {
-  localStorage.removeItem('user-token')
-  token.value = null
-  window.location.reload()
+  // sessionStorage.removeItem('current_user')
+  // token.value = null
+  window.location.href = '/'
 }
+
+
+function getMyProfile(){
+  let current_user = JSON.parse(sessionStorage.getItem('current_user'))
+  if(current_user !== null){
+    console.log(`/users/${current_user.id}`)
+    return `/users/${current_user.id}`
+  }
+  return `/explore`
+}
+
 </script>
 
 <style>

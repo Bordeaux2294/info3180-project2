@@ -42,12 +42,13 @@ function loginUser(){
   justify-content: center;
   height: 250px;
   margin-top: 100px;
+  padding-top: 50px;
 }
 
 .photogram_photo_div {
   border-radius: 10px;
-  width: 25%;
-  height: 90%;
+  width: 320px;
+  height: 245px;
   background-image: url(../images/under_pier.jpg);
   background-repeat: no-repeat;
   background-position: center;
@@ -126,6 +127,16 @@ hr {
 #register_button {
   background-color: rgb(40, 197, 40);
   border: 1px solid rgb(40, 197, 40);
+}
+
+#register_button:hover {
+  background-color: rgb(96, 247, 96);
+  border: 1px solid rgb(96, 247, 96);
+}
+
+#register_button:active {
+  background-color: rgb(0, 85, 0);
+  border: 1px solid rgb(0, 85, 0);
 }
 
 #login_button {

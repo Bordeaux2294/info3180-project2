@@ -53,7 +53,7 @@ const router = createRouter({
 })
 
 // router.beforeEach((to, from, next) => {
-//   const token = localStorage.getItem('user-token')
+//   const token = sessionStorage.getItem('current_user')
   
 //   if (token) {
 //     if (to.name == 'login' || to.name == 'register'){

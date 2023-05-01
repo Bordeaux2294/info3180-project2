@@ -1,11 +1,11 @@
 <template>
 
     <div class="new_post_container">
-        <form @submit.prevent="makeNewPost" id="new_post_form">
-            <label for="new_post_photo">Photo</label>
-            <input type="file" name="new_post_photo">
-            <label for="new_post_caption">Caption</label>
-            <input type="text" name="new_post_caption">
+        <form @submit.prevent="makeNewPost" id="new_post_form" enctype="multipart/form-data">
+            <label for="photo">Photo</label>
+            <input type="file" name="photo">
+            <label for="caption">Caption</label>
+            <input type="text" name="caption">
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -16,7 +16,12 @@
 <script setup>
     import {ref, onMounted} from 'vue'
 
+
+    let user_data = sessionStorage.getItem('current_user')
+
     let csrf_token = ref("");
+    let current_user = ref(JSON.parse(user_data))
+
 
     async function getCsrfToken() {
             await fetch('/api/v1/csrf-token')
@@ -31,7 +36,8 @@
         const form = document.getElementById('new_post_form')
         const formData = new FormData(form)
 
-        fetch('/api/v1/users/1/post', {
+        // console.log(current_user.value['message'])
+        fetch(`/api/v1/users/${current_user.value['id']}/posts`, {
         method: 'POST',
         body: formData,
         headers:{
@@ -41,10 +47,11 @@
             .then(async function (response){
                 if(response.ok){
                     let result = await response.json()
-                    console.log(result)
+                    alert(result['message'])
+                    window.location.href = '/explore'
                     
                 }else{
-                    alert("User could not be registered!")
+                    alert("New post could not be created!")
                 }
             })
             .catch (async function (error){

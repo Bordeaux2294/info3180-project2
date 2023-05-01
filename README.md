@@ -1,3 +1,10 @@
+# Members that Contributed
+Al-Romario Davis - 95% of the front end
+Trishanna Ford - 95% of the back end
+Orane - 5% of the backend, JWT generation function and the css for the explore page
+Gabrielle - log-in form css
+
+
 # INFO3180 VueJS and Flask Starter
 
 This template should help get you started developing with Vue 3 on the frontend and Flask as an API on the backend.

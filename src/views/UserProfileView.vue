@@ -12,7 +12,5 @@
 </script>
 
 <style>
-.userProfile_card {
-    border: 1px solid orange;
-}
+
 </style>

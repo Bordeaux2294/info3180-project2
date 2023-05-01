@@ -10,7 +10,7 @@ import jwt
 from functools import wraps
 from . import app, db, login_manager
 import os
-from flask import render_template, request, jsonify, send_file, make_response, send_from_directory
+from flask import render_template, request, jsonify, send_file, make_response,session, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from app.models import users, posts,likes, follows
 from app.forms import RegisterForm, LoginForm, NewPostForm
@@ -21,7 +21,7 @@ from functools import wraps
 from datetime import datetime, timedelta
 
 
-
+app.secret_key = app.config['SECRET_KEY']
 
 def requires_auth(f):
     @wraps(f)
@@ -83,20 +83,16 @@ def register():
             profile_photo = form.photo.data
             photo_filename = secure_filename(profile_photo.filename)
 
-            response = jsonify({"message": "User Successfully Added",
-                                "username": username,
-                                "first Name": firstname,
-                                "last Name": lastname,
-                                "password" :password,
-                                "email" : email,
-                                "location": location,
-                                "biography":biography,
-                                "photo": photo_filename})
+            
             new_user= users(username, password, firstname, lastname, email, location, biography, photo_filename)
             profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
             db.session.add(new_user)
             db.session.commit()
-        
+            idd= users.query.filter_by(username=username).first()
+            response = jsonify({"message": "User Successfully Added",
+                                "username": username,
+                                "id": idd.id})
+            
             return make_response(response,200)
         else:
             return make_response({'errors': form_errors(form)},400)
@@ -124,8 +120,12 @@ def login():
                 }
 
                 token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-            
-                return make_response(jsonify({'token' : token, "message": "Login Successful"}),201)
+                idd= users.query.filter_by(username=username).first()
+                session['user_id'] = idd.id
+                return make_response(jsonify({'token' : token,
+                                               "message": "Login Successful",
+                                               "id":idd.id}),201)
+                
         else:
             return make_response({'errors': form_errors(form)},400)
        
@@ -145,8 +145,8 @@ def load_user(id):
     return db.session.execute(db.select(users).filter_by(id=id)).scalar()
 
 @app.route('/api/v1/users/<user_id>/posts', methods = ['POST','GET'])
-@login_required
-@requires_auth
+# @login_required
+#@requires_auth
 def showposts(user_id):
     if request.method=='POST':
         form = NewPostForm()
@@ -170,23 +170,44 @@ def showposts(user_id):
             pList.append({
             "id": post.id,
             "user_id": post.user_id,
-            "photo": "/api/v1/photos/{}".format(post.photo),
+            "photo":"/api/v1/photos/{}".format(post.photo),
             "caption": post.caption,
             "created_on": post.created_on
         })
-    
         data = {"posts": pList}
         return jsonify(data)
 
+@app.route('/api/v1/get_profile/<user_id>', methods = ['GET'])
+def getinfo(user_id):
+    if request.method=='GET':
+        info= users.query.filter_by(id=user_id).first()
+        pnum = len(posts.query.filter_by(user_id=user_id).all())
+        fnum = len(follows.query.filter_by(user_id=user_id).all())
+        return make_response(jsonify({"id" : info.id,
+                                    "profile_photo": "/api/v1/profile_photo/{}".format(info.profile_photo),
+                                    "biography": info.biography,
+                                    "location":info.location,
+                                    "firstname":info.firstname,
+                                    "lastname":info.lastname,
+                                    "username":info.username,
+                                    "followers":fnum,
+                                    "posts":pnum,
+                                    "joined_on":info.joined_on}),201)
+                
+    else:
+        return make_response({'errors': 'user not found'},400)
+
+
+    
 
 
 
 @app.route('/api/v1/users/<user_id>/follow', methods = ['POST'])
-@login_required
-@requires_auth
-def follow(current_user, user_id):
+# @login_required
+# @requires_auth
+def follow(user_id):
     if request.method=='POST':
-        follower_id = current_user
+        follower_id = session.get('user_id')
         user_id = user_id
         newFollower = follows(follower_id, user_id)
         db.session.add(newFollower)
@@ -195,52 +216,38 @@ def follow(current_user, user_id):
         return make_response({"message": "Successfully followed user"},200)
     
 
-# @app.route('/api/v1/posts', methods = ['GET'])
-# @requires_auth
-# def showposts():
-#     postl = posts.query.all()
-#     plist = []
-#     for post in postl:
-#         likel = likes.query.filter_by(post_id=post.id).all()
-#         plist.append({
-#             "id": post.id,
-#             "user_id": post.user_id,
-#             "photo": "/api/v1/photos/{}".format(post.photo),
-#             "caption": post.caption,
-#             "created_on": post.created_on,
-#             "likes": likel 
-#         })
-    
-#     data = {"posts": plist}
-#     return jsonify(data)
-
-
-@app.route('/api/v1/posts', methods=['GET'])
-@login_required
+@app.route('/api/v1/posts', methods = ['GET'])
+#login_required
 #@requires_auth
-def get_all_posts():
-    """Return all posts for all users"""
-    postsl = db.session.execute(db.select(posts)).scalars()
-    all_posts = []
+def allPosts():
+    postsl = posts.query.all()
+    pList = []
+
     for post in postsl:
-        likel = db.session.execute(db.select(likes).filter_by(id=post.id)).scalars()
-        all_posts.append({
+        likesl = len(likes.query.filter_by(post_id=post.id).all())
+        user = users.query.filter_by(id = post.user_id).first()
+        pList.append({
             "id": post.id,
             "user_id": post.user_id,
-            "photo": post.photo,
+            "username": user.username,
+            "user_profile": "/api/v1/profile_photo/{}".format(user.profile_photo),  
+            "photo": "/api/v1/photos/{}".format(post.photo),
             "caption": post.caption,
             "created_on": post.created_on,
-            "likes": len([like for like in likel])
+            "likes": likesl
         })
-    return jsonify(all_posts), 200
+    
+    data = {"posts": pList}
+    return jsonify(data)
 
 
 @app.route('/api/v1/posts/<post_id>/like', methods = ['POST'])
-@login_required
-@requires_auth
+# @login_required
+# @requires_auth
 def like(post_id):
     if request.method=='POST':
-        user_id = current_user
+        user_id =  session.get('user_id')
+        
         post_id = post_id
         newLike= likes(post_id, user_id)
         db.session.add(newLike)
@@ -251,7 +258,7 @@ def like(post_id):
 
 
 @app.route('/api/v1/photos/<filename>')
-@requires_auth
+#@requires_auth
 def getPhoto(filename):
     root_dir = os.getcwd()
     return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER']), filename)
@@ -259,9 +266,9 @@ def getPhoto(filename):
 
 
 @app.route('/api/v1/profile_photo/<filename>')
-@login_required
-@requires_auth
-def getProfilePhoto(current_user, filename):
+# @login_required
+# @requires_auth
+def getProfilePhoto(filename):
     root_dir = os.getcwd()
     return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER']), filename)
 
@@ -314,8 +321,3 @@ def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
 
-# profile_photo="er"
-# new_user= Users("gravl","password","firstname","lastname","t@gmail.com","location","biography","photo_filename")
-# profile_photo.save(os.path.join(app.config['UPLOAD_FOLDER'], profile_photo))
-# db.session.add(new_user)
-# db.session.commit()
